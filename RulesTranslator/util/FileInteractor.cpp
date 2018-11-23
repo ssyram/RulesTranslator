@@ -152,6 +152,7 @@ namespace rules_translator {
                         ss << buffer[buffered_pos];
                     if (buffer[buffered_pos] == '}') {
                         ++buffered_pos;
+                        t = FileInteractor::ReadContentType::block;
                         break;
                     }
                     getline(origin, buffer, '}');
@@ -205,7 +206,6 @@ namespace rules_translator {
                         err("Not a valid end, a valid end must be \"```\" in the tail of a line.");
                     finished = true;
                     return std::nullopt;
-                    break;
                     
                 default:
                     break;

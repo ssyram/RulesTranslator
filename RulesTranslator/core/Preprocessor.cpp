@@ -28,8 +28,8 @@ namespace rules_translator::utils {
     // the Production, and in this time, it should have a means to distinguish each
     // of the Production to prevent the duplication of Productions.
     struct e_production {
-        const Production &p;
-        e_production(const Production &p): p(p) {}
+        const Production p;
+        e_production(const Production p): p(p) {}
         bool operator==(const e_production &ep) const {
             return p.left == ep.p.left && p.right == ep.p.right;
         }
@@ -114,7 +114,7 @@ namespace rules_translator {
             const auto &it = nonterminate_typeMap.find(s);
             if (it != nonterminate_typeMap.end())
                 return it->second;
-            terminate_typeMap[s] = nt_next_id;
+            nonterminate_typeMap[s] = nt_next_id;
             info.nonterminateType_CppClassName_map[nt_next_id] = "default_object_type";
             return nt_next_id++;
         }
@@ -205,12 +205,20 @@ namespace rules_translator {
             unordered_set<utils::e_production> eps; // to distinguish each of the production
             while (buffer) {
                 Production p;
+                try {
+                    while (buffer.value().type == rct::semicolon)
+                        buffer = fi.read();
+                }
+                catch (std::bad_optional_access &) {
+                    break;
+                }
                 if (buffer.value().type == rct::orSymbol) {
                     if (temp_left == -1) generateException("Not a valid Or Symbol.");
                     p.left = temp_left;
                 }
                 else {
-                    if (buffer.value().type != rct::word || terminate_typeMap.find(buffer->content) != terminate_typeMap.end())
+                    if (buffer.value().type != rct::word ||
+                        terminate_typeMap.find(buffer->content) != terminate_typeMap.end())
                         generateException("Expected a kind of nonterminate symbol");
                     p.left = getNonterminateType(buffer->content);
                     temp_left = p.left;
@@ -219,10 +227,14 @@ namespace rules_translator {
                         generateException("Expected a ':='");
                 }
                 buffer = fi.read();
+                auto temp_f = terminate_typeMap.begin();
                 // tackle production right
                 while (buffer && (buffer->type == rct::terminate || buffer->type == rct::word)) {
                     if (buffer->type == rct::terminate)
-                        p.right.emplace_back(true, terminate_typeMap.find(buffer->content)->second);
+                        if ((temp_f = terminate_typeMap.find(buffer->content)) == terminate_typeMap.end())
+                            generateException("No such terminate type!");
+                        else
+                            p.right.emplace_back(true, temp_f->second);
                     else {
                         if (terminate_typeMap.find(buffer->content) != terminate_typeMap.end())
                             p.right.emplace_back(true, terminate_typeMap.find(buffer->content)->second);
@@ -234,105 +246,109 @@ namespace rules_translator {
                 p.productionId = next_production_id;
                 // block tackle
                 if (buffer && buffer.value().type == rct::block) {
-                    // change all $<num> and $$ to formal name and return what the <num>s are
-                    // $<num> will be changed to __c<num>
-                    // $$ will be changed to __r
-                    
-                    // an error in using iterator
-//                    auto modifyBlock = [] (string &s) -> unordered_set<size_t> {
-//                        unordered_set<size_t> nums;
-//                        for (auto it = s.begin(); it != s.end(); ++it) {
-//                            if (*it == '$' && it + 1 != s.end()) {
-//                                if (it[1] == '$') {
-//                                    s.replace(it, it + 2, "__r");
-//                                }
-//                                else if (utils::isNumber(it[1])) {
-//                                    s.replace(it, it + 1, "__c");
-//                                    cout << *it << it[1] << it[2] << it[3] << endl;
-//                                    it += 3;
-//                                    size_t temp = *it - '0';
-//                                    while (utils::isNumber(it[1])) {
-//                                        ++it;
-//                                        temp = temp * 10 + *it - '0';
-//                                    }
-//                                    nums.insert(temp);
-//                                }
-//                            }
-//                        }
-//                        return nums;
-//                    };
-                    
-                    auto modifyBlock = [] (string &s) -> unordered_set<size_t> {
-                        unordered_set<size_t> nums;
-                        for (size_t i = 0; i < s.length(); ++i) {
-                            if (s[i] == '$' && i + 1 < s.length()) {
-                                char c = s[i + 1];
-                                if (c == '$') {
-                                    s.replace(s.begin() + i, s.begin() + i + 2, "__r");
-                                    i += 2;
-                                }
-                                else if (utils::isNumber(c)) {
-                                    s.replace(s.begin() + i, s.begin() + i + 1, "__c");
-                                    // cout << *it << it[1] << it[2] << it[3] << endl;
-                                    i += 3;
-                                    size_t temp = c - '0';
-                                    while (i + 1 < s.length() && utils::isNumber(s[i + 1])) {
-                                        ++i;
-                                        temp = temp * 10 + s[i] - '0';
+                    do { // give a break point
+                        // change all $<num> and $$ to formal name and return what the <num>s are
+                        // $<num> will be changed to __c<num>
+                        // $$ will be changed to __r
+                        
+                        // an error in using iterator
+    //                    auto modifyBlock = [] (string &s) -> unordered_set<size_t> {
+    //                        unordered_set<size_t> nums;
+    //                        for (auto it = s.begin(); it != s.end(); ++it) {
+    //                            if (*it == '$' && it + 1 != s.end()) {
+    //                                if (it[1] == '$') {
+    //                                    s.replace(it, it + 2, "__r");
+    //                                }
+    //                                else if (utils::isNumber(it[1])) {
+    //                                    s.replace(it, it + 1, "__c");
+    //                                    cout << *it << it[1] << it[2] << it[3] << endl;
+    //                                    it += 3;
+    //                                    size_t temp = *it - '0';
+    //                                    while (utils::isNumber(it[1])) {
+    //                                        ++it;
+    //                                        temp = temp * 10 + *it - '0';
+    //                                    }
+    //                                    nums.insert(temp);
+    //                                }
+    //                            }
+    //                        }
+    //                        return nums;
+    //                    };
+                        if (utils::trimMeaninglessDividers(buffer->content).empty()) break;
+                        auto modifyBlock = [] (string &s) -> unordered_set<size_t> {
+                            unordered_set<size_t> nums;
+                            for (size_t i = 0; i < s.length(); ++i) {
+                                if (s[i] == '$' && i + 1 < s.length()) {
+                                    char c = s[i + 1];
+                                    if (c == '$') {
+                                        s.replace(s.begin() + i, s.begin() + i + 2, "__r");
+                                        i += 2;
                                     }
-                                    nums.insert(temp);
+                                    else if (utils::isNumber(c)) {
+                                        s.replace(s.begin() + i, s.begin() + i + 1, "__c");
+                                        // cout << *it << it[1] << it[2] << it[3] << endl;
+                                        i += 3;
+                                        size_t temp = c - '0';
+                                        while (i + 1 < s.length() && utils::isNumber(s[i + 1])) {
+                                            ++i;
+                                            temp = temp * 10 + s[i] - '0';
+                                        }
+                                        nums.insert(temp);
+                                    }
                                 }
                             }
+                            return nums;
+                        };
+                        auto numset = modifyBlock(buffer->content);
+                        char title[128] = {0};
+                        p.productionId = next_production_id;
+                        sprintf(title, "object_type __process_%lu(object_type content[]) {", next_production_id);
+                        
+                        fi.writeln(title);
+    //                    string &ts = info.nonterminateType_CppClassName_map.find(p.left)->second;
+                        const auto &it = info.nonterminateType_CppClassName_map.find(p.left);
+                        const string &ts = it == info.nonterminateType_CppClassName_map.end() ? "default_object_type" : it->second;
+                        fi.write("object_type r = ").write(ts).writeln("{};");
+                        fi.writeln("std::visit(overloaded {");
+                        fi.write("[] (");
+                        // output all parameter list corresponding to the specified position
+                        sprintf(title, "__c");
+                        for (auto i: numset) {
+                            if (i > p.right.size())
+                                generateException("Block content out of range.");
+                            symbol &s = p.right[i - 1];
+                            if (s.isTerminate)
+    //                            fi.write(info.token_type).write(" &&");
+                                fi.write("token_type &&");
+                            else {
+                                const auto &it = info.nonterminateType_CppClassName_map.find(s.type);
+                                if (it == info.nonterminateType_CppClassName_map.end())
+                                    fi.write("default_object_type &&");
+                                else
+                                    fi.write(it->second).write(" &&");
+                            }
+                            sprintf(title + 3, "%lu", i);
+                            fi.write(title).write(", ");
                         }
-                        return nums;
-                    };
-                    auto numset = modifyBlock(buffer->content);
-                    char title[128] = {0};
-                    p.productionId = next_production_id;
-                    sprintf(title, "object_type __process_%lu(object_type content[]) {", next_production_id);
-                    
-                    fi.writeln(title);
-//                    string &ts = info.nonterminateType_CppClassName_map.find(p.left)->second;
-                    const auto &it = info.nonterminateType_CppClassName_map.find(p.left);
-                    const string &ts = it == info.nonterminateType_CppClassName_map.end() ? "default_object_type" : it->second;
-                    fi.write("object_type r = ").write(ts).writeln("{};");
-                    fi.writeln("std::visit(overloaded {");
-                    fi.write("[] (");
-                    // output all parameter list corresponding to the specified position
-                    sprintf(title, "__c");
-                    for (auto i: numset) {
-                        symbol &s = p.right[i - 1];
-                        if (s.isTerminate)
-//                            fi.write(info.token_type).write(" &&");
-                            fi.write("token_type &&");
-                        else {
-                            const auto &it = info.nonterminateType_CppClassName_map.find(s.type);
-                            if (it == info.nonterminateType_CppClassName_map.end())
-                                fi.write("default_object_type &&");
-                            else
-                                fi.write(it->second).write(" &&");
+                        
+                        fi.write(ts).writeln(" &__r) {");
+                        fi.writeln(buffer->content);
+                        fi.write("}\n,[] (");
+                        for (size_t i = 0; i < numset.size(); ++i)
+                            fi.write("auto &&, ");
+                        fi.write("auto &) { assert(false); },\n}, ");
+                        sprintf(title, "std::move(content[");
+                        for (auto i: numset) {
+                            sprintf(title + 18, "%lu]), ", i - 1);
+                            fi.write(title);
                         }
-                        sprintf(title + 3, "%lu", i);
-                        fi.write(title).write(", ");
-                    }
-                    
-                    fi.write(ts).writeln(" &__r) {");
-                    fi.writeln(buffer->content);
-                    fi.write("}\n,[] (");
-                    for (size_t i = 0; i < numset.size(); ++i)
-                        fi.write("auto &&, ");
-                    fi.write("auto &) { assert(false); },\n}, ");
-                    sprintf(title, "std::move(content[");
-                    for (auto i: numset) {
-                        sprintf(title + 18, "%lu]), ", i - 1);
-                        fi.write(title);
-                    }
-                    fi.writeln("r);\n return r;");
-                    fi.writeln("}");
+                        fi.writeln("r);\n return r;");
+                        fi.writeln("}");
+                        with_process_set.emplace(next_production_id);
+                    } while (false);
                     buffer = fi.read();
-                    with_process_set.emplace(next_production_id);
                 }
-                info.productions.push_back(p);
+                info.productions.emplace_back(std::move(p));
                 // hold reference in the set, almost zero construct cost
                 if (!eps.emplace(info.productions[next_production_id - 1]).second)
                     generateException("This production has already existed.");
@@ -352,6 +368,10 @@ namespace rules_translator {
             fillNameMetaData();
             generateProductions(fillBindingList());
             info.nonterminateType_amount = nt_next_id;
+            for (auto p: terminate_typeMap)
+                info.terminate2StringMap.insert(std::make_pair(p.second, p.first));
+            for (auto p: nonterminate_typeMap)
+                info.nonterminate2StringMap.insert(std::make_pair(p.second, p.first));
             
             return &info;
         }

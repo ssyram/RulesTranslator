@@ -111,25 +111,28 @@ namespace rules_translator {
 //        }
         
         template <bool pre>
-        static void outputConditionPackage (const ConditionPackage &p, const size_t condition) {
+        void outputConditionPackage (const ConditionPackage &p, const size_t condition) {
             if constexpr (pre) cout << "Condition <pre>: {" << endl;
             else cout << "Condition <" << condition << ">: {" <<endl;
             for (const auto &item: p) {
                 const auto &pwd = item.first;
                 const auto &symset = item.second;
-                cout << "\t id: " << pwd.p.productionId << ", " << pwd.p.left << ": { ";
+                cout << "\t id: " << pwd.p.productionId << ", " << info.nonterminate2StringMap[pwd.p.left] << ": { ";
                 const auto &right = pwd.p.right;
                 size_t size = right.size();
                 size_t docPos = pwd.docPos;
                 for (size_t i = 0; i < size; ++i) {
                     if (i == docPos) cout << "^.";
                     const auto &sym = right[i];
-                    cout << (sym.isTerminate ? "(t)" : "(n)") << sym.type << ", ";
+                    if (sym.isTerminate)
+                        cout << "\"" << info.terminate2StringMap[sym.type] << "\", ";
+                    else
+                        cout << info.nonterminate2StringMap[sym.type] << ", ";
                 }
                 
                 cout << (docPos == size ? "^. }; { " : "}; { ");
                 for (const auto &sym: symset)
-                    cout << sym << ", ";
+                    cout << info.terminate2StringMap[sym] << ", ";
                 cout << "}" << endl;
             }
             cout << "};" << endl;
@@ -295,7 +298,7 @@ namespace rules_translator {
             auto fillShiftGotoAction = [this, &condition, &pre_condition, &s] () {
                 ll &v = s.isTerminate ? actionTable[pre_condition][s.type] : gotoTable[pre_condition][s.type];
                 if (v && v != condition)
-                    throw TranslateException("Collision occurs.");
+                    generateCollisionException(pre_condition, s, v, condition);
                 v = condition;
             };
             // if already existed
@@ -306,10 +309,10 @@ namespace rules_translator {
             }
             // a new condition
             condition = next_condition_id++;
+            if constexpr (test) outputConditionPackage<false>(p, condition);
             fillShiftGotoAction();
             // find where can it get to or reduce
             unordered_set<symbol> count;
-            if constexpr (test) outputConditionPackage<false>(p, condition);
             for (const auto &it: p) {
                 const auto &pro = it.first;
                 // reduce
@@ -318,8 +321,9 @@ namespace rules_translator {
                     ll targetValue = -((ll)pro.p.productionId);
                     for (auto n: it.second) {
                         ll &v = line[n];
-                        if (v && v != targetValue)
-                            throw TranslateException("Collision occurs.");
+                        if (v && v != targetValue) {
+                            generateCollisionException(pre_condition, s, v, targetValue);
+                        }
                         v = targetValue;
                     }
                     continue;
@@ -335,6 +339,33 @@ namespace rules_translator {
                 if constexpr (test) calculateCondition<true>(np, condition, sym);
                 else calculateCondition(np, condition, sym);
             }
+        }
+        void generateCollisionException(const ll &pre_condition, const symbol &sym, const ll &before, const ll &newCome) {
+            cout << "Collision occurs, previous condition: " << pre_condition << endl;
+            cout << "Accept symbol: ";
+            if (sym.isTerminate)
+                cout << "\"" << info.terminate2StringMap[sym.type] << "\"" << endl;
+            else
+                cout << info.nonterminate2StringMap[sym.type] << endl;
+            auto outputProduction = [this] (ll id) {
+                const auto &p = info.productions[id];
+                cout << "id: " << p.productionId << ", " << info.nonterminate2StringMap[p.left] << ": { ";
+                for (const auto &sym: p.right)
+                    if (sym.isTerminate)
+                        cout << "\"" << info.terminate2StringMap[sym.type] << "\", ";
+                    else
+                        cout << info.nonterminate2StringMap[sym.type] << ", ";
+                cout << "};" << endl;
+            };
+            if (before > 0)
+                cout << "existed Condition <" << before << ">." << endl;
+            else
+                outputProduction(-before);
+            if (newCome > 0)
+                cout << "newly come Condition <" << newCome << ">." << endl;
+            else
+                outputProduction(-newCome);
+            throw TranslateException("Collision occurs!");
         }
         template <bool consoleOutput = false>
         void outputResult() {
