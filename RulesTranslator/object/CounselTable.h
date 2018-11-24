@@ -25,6 +25,11 @@ namespace rules_translator {
         vector<ll*> table;
     public:
         CounselTable(size_t terminateTypeAmount): lineElementAmount(terminateTypeAmount) {}
+        ~CounselTable() {
+            for (auto &l: table) {
+                if (l) delete[] l;
+            }
+        }
         ll *operator[](size_t lineNum) {
             for (size_t i = table.size(); i <= lineNum; ++i)
                 table.push_back(new ll[lineElementAmount]()); // all elements will be initialize as 0
