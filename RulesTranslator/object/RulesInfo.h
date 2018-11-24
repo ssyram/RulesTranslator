@@ -17,6 +17,8 @@ namespace rules_translator {
 //        string get_type;
         size_t eof; // the ending terminate number, also at the same time the amount of other terminate
         size_t nonterminateType_amount;
+        unordered_map<symbol_type, string> terminate2StringMap;
+        unordered_map<symbol_type, string> nonterminate2StringMap;
         // same the map between nonterminate type and corresponding C++ class name
         unordered_map<symbol_type, string> nonterminateType_CppClassName_map;
         vector<Production> productions;

@@ -40,11 +40,11 @@ bool (*isnum)(const char c) = &::utils::isNumber;
 
 int main(int argc, const char * argv[]) {
     
-    std::visit(overloaded {
-        [] () {
-            cout << "OK" << endl;
-        }
-    });
+//    std::visit(overloaded {
+//        [] () {
+//            cout << "OK" << endl;
+//        }
+//    });
     
     rules_translator::test::test_Sample();
     

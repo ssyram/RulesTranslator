@@ -45,6 +45,7 @@ namespace rules_translator::utils {
     
     string &trimDivider(string &s);
     
+    string &trimMeaninglessDividers(string &s);
 }
 
 #endif /* UtilFunctions_hpp */

@@ -36,4 +36,13 @@ namespace rules_translator::utils {
         
         return s;
     }
+    
+    string &trimMeaninglessDividers(string &s) {
+        size_t b = 0, e = s.length();
+        while (isDivider(s[b])) ++b;
+        while (b < e && isDivider(s[e - 1])) --e;
+        s = s.substr(b, e);
+        return s;
+    }
+    
 }

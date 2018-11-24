@@ -152,6 +152,7 @@ namespace rules_translator {
                         ss << buffer[buffered_pos];
                     if (buffer[buffered_pos] == '}') {
                         ++buffered_pos;
+                        t = FileInteractor::ReadContentType::block;
                         break;
                     }
                     getline(origin, buffer, '}');

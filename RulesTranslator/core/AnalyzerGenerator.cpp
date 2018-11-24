@@ -44,7 +44,7 @@ namespace rules_translator {
         "        analyze<finish>(t);\n"
         "    }\n"
         "public:\n"
-        "    SyntacticAnalyzer() { astack.emplace(0, default_object_type()); }"
+        "    SyntacticAnalyzer() { astack.emplace(1, default_object_type()); }\n"
         "    template <bool finish = false>\n"
         "    void analyze(const token_type &t) {\n"
         "        ll symtype;\n"
