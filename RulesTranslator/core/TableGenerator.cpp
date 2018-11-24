@@ -144,6 +144,7 @@ namespace rules_translator {
             p.left = info.nonterminateType_amount;
             p.right.emplace_back(false, info.productions[0].left);
             p.right.emplace_back(true, info.eof);
+            info.terminate2StringMap[info.eof] = "$eof$";
             info.productions.emplace(info.productions.begin(), std::move(p));
         }
         void fillSupportVars() {
@@ -299,6 +300,7 @@ namespace rules_translator {
                 ll &v = s.isTerminate ? actionTable[pre_condition][s.type] : gotoTable[pre_condition][s.type];
                 if (v && v != condition)
                     generateCollisionException(pre_condition, s, v, condition);
+                cout << "From Condition [" << pre_condition << "], shift to Condition [" << condition << "]" << endl;
                 v = condition;
             };
             // if already existed
@@ -319,6 +321,7 @@ namespace rules_translator {
                 if (pro.end()) {
                     ll *line = actionTable[condition];
                     ll targetValue = -((ll)pro.p.productionId);
+                    cout << "Reduce in Condition [" << condition << "], id: " << pro.p.productionId << endl;
                     for (auto n: it.second) {
                         ll &v = line[n];
                         if (v && v != targetValue) {

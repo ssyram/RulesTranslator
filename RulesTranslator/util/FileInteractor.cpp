@@ -206,6 +206,7 @@ namespace rules_translator {
                         err("Not a valid end, a valid end must be \"```\" in the tail of a line.");
                     finished = true;
                     return std::nullopt;
+                    break;
                     
                 default:
                     break;

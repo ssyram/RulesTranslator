@@ -284,7 +284,7 @@ namespace rules_translator {
                                         s.replace(s.begin() + i, s.begin() + i + 2, "__r");
                                         i += 2;
                                     }
-                                    else if (utils::isNumber(c)) {
+                                    else if (c >= '1' && c <= '9') {
                                         s.replace(s.begin() + i, s.begin() + i + 1, "__c");
                                         // cout << *it << it[1] << it[2] << it[3] << endl;
                                         i += 3;
