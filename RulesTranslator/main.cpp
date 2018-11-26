@@ -46,9 +46,9 @@ int main(int argc, const char * argv[]) {
 //        }
 //    });
     
-    rules_translator::test::test_Sample();
+//    rules_translator::test::test_Sample();
     
-//    rules_translator::test::test();
+    rules_translator::test::test();
 
 //    bool a = true;
 

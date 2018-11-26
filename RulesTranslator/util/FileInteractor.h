@@ -51,6 +51,8 @@ namespace rules_translator {
         
         // target file is not existed, or it will be emptied
         FileInteractor(const string &originalFilePath, const string &targetFilePath);
+        FileInteractor(const FileInteractor &) = delete;
+        FileInteractor &operator=(const FileInteractor &) = delete;
         ~FileInteractor();
         
         FileInteractor &writeln(const string &);

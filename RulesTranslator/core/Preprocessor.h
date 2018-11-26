@@ -30,6 +30,7 @@ namespace rules_translator {
     public:
         Preprocessor(FileInteractor &);
         Preprocessor(const Preprocessor &) = delete;
+        Preprocessor &operator=(const Preprocessor &) = delete;
         ~Preprocessor();
         RulesInfo *generateInfo();
     };

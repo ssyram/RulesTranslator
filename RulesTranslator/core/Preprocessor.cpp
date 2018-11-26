@@ -157,6 +157,7 @@ namespace rules_translator {
                     generateException("No duplicated type");
                 terminate_typeMap[tempv[i]] = i;
             }
+            terminate_typeMap[","] = tempv.size();
             info.eof = tempv.size();
             
             // get token_type

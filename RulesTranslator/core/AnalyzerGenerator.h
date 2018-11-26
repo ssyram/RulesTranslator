@@ -28,6 +28,7 @@ namespace rules_translator {
     public:
         AnalyzerGenerator(FileInteractor &fi);
         AnalyzerGenerator(const AnalyzerGenerator &) = delete;
+        AnalyzerGenerator &operator=(const AnalyzerGenerator &) = delete;
         ~AnalyzerGenerator();
         void generate();
     };
