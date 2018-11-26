@@ -27,7 +27,6 @@ variant<int, bool, double> k;
 #include <unordered_set>
 #include "Runner.h"
 #include "test/TestSample.h"
-#include "extern/TargetFormat.h"
 using std::unordered_set;
 
 //namespace utils {

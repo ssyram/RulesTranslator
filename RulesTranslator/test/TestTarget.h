@@ -36,7 +36,7 @@ tmn getType(const char &c) {
 using ll = long long;
 // 这里必须要声明下面会用到的getValue函数，但是可以不实现它。
 ll getValue(const char &c);
-double unionDouble(ll &k1, double &&k2) {
+double unionDouble(ll &k1, double k2) {
     while (int(k2)) k2 /= 10;
     return k1 + k2;
 }
