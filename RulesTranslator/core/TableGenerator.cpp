@@ -122,15 +122,15 @@ namespace rules_translator {
                 size_t size = right.size();
                 size_t docPos = pwd.docPos;
                 for (size_t i = 0; i < size; ++i) {
-                    if (i == docPos) cout << "^.";
+                    if (i == docPos) cout << "@";
                     const auto &sym = right[i];
                     if (sym.isTerminate)
-                        cout << "\"" << info.terminate2StringMap[sym.type] << "\", ";
+                        cout << "\"" << info.terminate2StringMap[sym.type] << "\" ";
                     else
-                        cout << info.nonterminate2StringMap[sym.type] << ", ";
+                        cout << info.nonterminate2StringMap[sym.type] << " ";
                 }
                 
-                cout << (docPos == size ? "^. }; { " : "}; { ");
+                cout << (docPos == size ? "@ }; { " : "}; { ");
                 for (const auto &sym: symset)
                     cout << info.terminate2StringMap[sym] << ", ";
                 cout << "}" << endl;
@@ -292,6 +292,7 @@ namespace rules_translator {
                     }
                 }
             };
+            cout << endl;
             if constexpr (test) outputConditionPackage<true>(p, 0); // output pre condition
             tracePackage();
 //            size_t condition = getPackageCondition(p);
@@ -300,7 +301,10 @@ namespace rules_translator {
                 ll &v = s.isTerminate ? actionTable[pre_condition][s.type] : gotoTable[pre_condition][s.type];
                 if (v && v != condition)
                     generateCollisionException(pre_condition, s, v, condition);
-                cout << "From Condition [" << pre_condition << "], shift to Condition [" << condition << "]" << endl;
+                if (s.isTerminate)
+                    cout << "From Condition [" << pre_condition << "], by symbol, \"" << info.terminate2StringMap[s.type] << "\" shift to Condition [" << condition << "]" << endl;
+                else
+                    cout << "From Condition [" << pre_condition << "], by symbol, " << info.nonterminate2StringMap[s.type] << " goto Condition [" << condition << "]" << endl;
                 v = condition;
             };
             // if already existed
@@ -325,7 +329,8 @@ namespace rules_translator {
                     for (auto n: it.second) {
                         ll &v = line[n];
                         if (v && v != targetValue) {
-                            generateCollisionException(pre_condition, s, v, targetValue);
+                            symbol s(true, n);
+                            generateCollisionException(condition, s, v, targetValue);
                         }
                         v = targetValue;
                     }
@@ -344,6 +349,7 @@ namespace rules_translator {
             }
         }
         void generateCollisionException(const ll &pre_condition, const symbol &sym, const ll &before, const ll &newCome) {
+            cout << endl;
             cout << "Collision occurs, previous condition: " << pre_condition << endl;
             cout << "Accept symbol: ";
             if (sym.isTerminate)
