@@ -18,5 +18,6 @@
 #include <functional>
 #include <string>
 #include <stack>
+#include <cassert>
 
 #endif /* rules_translator_h */
