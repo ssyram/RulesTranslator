@@ -55,141 +55,141 @@ namespace calculator_stuff {
     object_type __process_1(object_type content[]) {
         object_type r = default_object_type{};
         std::visit(overloaded {
-            [] (expr &&__c1, default_object_type &__r) {
+            [] (expr &__c1, default_object_type &__r) {
                 printf("%lf\n", __c1.val);
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[0]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[0], r);
         return r;
     }
     object_type __process_2(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c3, expr &&__c1, expr &__r) {
+            [] (expr &__c3, expr &__c1, expr &__r) {
                 __r.val = __c1.val + __c3.val;
             }
-            ,[] (auto &&, auto &&, auto &) { assert(false); },
-        }, std::move(content[2]), std::move(content[0]), r);
+            ,[] (auto &, auto &, auto &) { assert(false); },
+        }, content[2], content[0], r);
         return r;
     }
     object_type __process_3(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c3, expr &&__c1, expr &__r) {
+            [] (expr &__c3, expr &__c1, expr &__r) {
                 __r.val = __c1.val - __c3.val;
             }
-            ,[] (auto &&, auto &&, auto &) { assert(false); },
-        }, std::move(content[2]), std::move(content[0]), r);
+            ,[] (auto &, auto &, auto &) { assert(false); },
+        }, content[2], content[0], r);
         return r;
     }
     object_type __process_4(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c1, expr &__r) {
+            [] (expr &__c1, expr &__r) {
                 __r.val = __c1.val;
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[0]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[0], r);
         return r;
     }
     object_type __process_5(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c3, expr &&__c1, expr &__r) {
+            [] (expr &__c3, expr &__c1, expr &__r) {
                 __r.val = __c1.val * __c3.val;
             }
-            ,[] (auto &&, auto &&, auto &) { assert(false); },
-        }, std::move(content[2]), std::move(content[0]), r);
+            ,[] (auto &, auto &, auto &) { assert(false); },
+        }, content[2], content[0], r);
         return r;
     }
     object_type __process_6(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c3, expr &&__c1, expr &__r) {
+            [] (expr &__c3, expr &__c1, expr &__r) {
                 __r.val = __c1.val / __c3.val;
             }
-            ,[] (auto &&, auto &&, auto &) { assert(false); },
-        }, std::move(content[2]), std::move(content[0]), r);
+            ,[] (auto &, auto &, auto &) { assert(false); },
+        }, content[2], content[0], r);
         return r;
     }
     object_type __process_7(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c1, expr &__r) {
+            [] (expr &__c1, expr &__r) {
                 __r.val = __c1.val;
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[0]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[0], r);
         return r;
     }
     object_type __process_8(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (expr &&__c2, expr &__r) {
+            [] (expr &__c2, expr &__r) {
                 __r.val = __c2.val;
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[1]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[1], r);
         return r;
     }
     object_type __process_9(object_type content[]) {
         object_type r = expr{};
         std::visit(overloaded {
-            [] (double &&__c1, expr &__r) {
+            [] (double &__c1, expr &__r) {
                 __r.val = __c1;
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[0]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[0], r);
         return r;
     }
     object_type __process_10(object_type content[]) {
         object_type r = double{};
         std::visit(overloaded {
-            [] (ll &&__c3, ll &&__c1, double &__r) {
+            [] (ll &__c3, ll &__c1, double &__r) {
                 __r = unionDouble(__c1, __c3);
             }
-            ,[] (auto &&, auto &&, auto &) { assert(false); },
-        }, std::move(content[2]), std::move(content[0]), r);
+            ,[] (auto &, auto &, auto &) { assert(false); },
+        }, content[2], content[0], r);
         return r;
     }
     object_type __process_11(object_type content[]) {
         object_type r = double{};
         std::visit(overloaded {
-            [] (ll &&__c1, double &__r) {
+            [] (ll &__c1, double &__r) {
                 __r = __c1;
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[0]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[0], r);
         return r;
     }
     object_type __process_12(object_type content[]) {
         object_type r = ll{};
         std::visit(overloaded {
-            [] (token_type &&__c2, ll &&__c1, ll &__r) {
+            [] (token_type &__c2, ll &__c1, ll &__r) {
                 __r = __c1 * 10 + (__c1 > 0 ? getValue(__c2) : -getValue(__c2));
             }
-            ,[] (auto &&, auto &&, auto &) { assert(false); },
-        }, std::move(content[1]), std::move(content[0]), r);
+            ,[] (auto &, auto &, auto &) { assert(false); },
+        }, content[1], content[0], r);
         return r;
     }
     object_type __process_13(object_type content[]) {
         object_type r = ll{};
         std::visit(overloaded {
-            [] (token_type &&__c1, ll &__r) {
+            [] (token_type &__c1, ll &__r) {
                 __r = getValue(__c1);
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[0]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[0], r);
         return r;
     }
     object_type __process_14(object_type content[]) {
         object_type r = ll{};
         std::visit(overloaded {
-            [] (token_type &&__c2, ll &__r) {
+            [] (token_type &__c2, ll &__r) {
                 __r = -getValue(__c2);
             }
-            ,[] (auto &&, auto &) { assert(false); },
-        }, std::move(content[1]), r);
+            ,[] (auto &, auto &) { assert(false); },
+        }, content[1], r);
         return r;
     }
     const std::unordered_map<size_t, std::function<object_type (object_type[])>> pf_map = {

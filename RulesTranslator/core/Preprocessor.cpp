@@ -336,13 +336,13 @@ namespace rules_translator {
                             symbol &s = p.right[i - 1];
                             if (s.isTerminate)
     //                            fi.write(info.token_type).write(" &&");
-                                fi.write("token_type &&");
+                                fi.write("token_type &");
                             else {
                                 const auto &it = info.nonterminateType_CppClassName_map.find(s.type);
                                 if (it == info.nonterminateType_CppClassName_map.end())
-                                    fi.write("default_object_type &&");
+                                    fi.write("default_object_type &");
                                 else
-                                    fi.write(it->second).write(" &&");
+                                    fi.write(it->second).write(" &");
                             }
                             sprintf(title + 3, "%lu", i);
                             fi.write(title).write(", ");
@@ -352,11 +352,11 @@ namespace rules_translator {
                         fi.writeln(buffer->content);
                         fi.write("}\n,[] (");
                         for (size_t i = 0; i < numset.size(); ++i)
-                            fi.write("auto &&, ");
+                            fi.write("auto &, ");
                         fi.write("auto &) { assert(false); },\n}, ");
-                        sprintf(title, "std::move(content[");
+                        sprintf(title, "content[");
                         for (auto i: numset) {
-                            sprintf(title + 18, "%lu]), ", i - 1);
+                            sprintf(title + 8, "%lu], ", i - 1);
                             fi.write(title);
                         }
                         fi.writeln("r);\n return r;");

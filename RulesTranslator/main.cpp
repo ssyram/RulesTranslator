@@ -46,7 +46,7 @@ int main(int argc, const char * argv[]) {
 //        }
 //    });
     
-//    rules_translator::test::test_Sample();
+    rules_translator::test::test_Sample();
     
 //    rules_translator::test::test();
 
@@ -123,7 +123,7 @@ int main(int argc, const char * argv[]) {
 //    for (const auto &s: set)
 //        cout << s << endl;
     
-    rules_translator::test::test_FileInteractor();
+//    rules_translator::test::test_FileInteractor();
     
 //    cout << "abc" << "\a a" << endl;
 //    string s = "abcdefghijklmnopq";
