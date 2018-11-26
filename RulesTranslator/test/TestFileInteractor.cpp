@@ -28,6 +28,7 @@ namespace rules_translator::test {
                 cout << "{ " << rules_translator::utils::mapType2String.find(r->type)->second << ": " << ::rules_translator::utils::trimDivider(r->content) << " }";
             else
                 cout << "{ " << rules_translator::utils::mapType2String.find(r->type)->second << " }";
+//            cout << endl;
             getline(cin, s);
         }
         cout << "---------------end---------------" << endl;

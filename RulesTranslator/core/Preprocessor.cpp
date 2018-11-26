@@ -49,10 +49,11 @@ namespace std {
             size_t r = 0;
             r |= shift_change(ep.p.left, 8, 0);
             r |= shift_change(size, 4, 8);
+            if (!size) return r;
             for (uint8_t i = 0; i < 5 && i <= size / 2; ++i) {
                 r |= shift_change(rv[i].type, 4, 12 + 10 * i);
                 r |= rv[i].isTerminate ? 0 : (1 << (16 + 10 * i));
-                r |= shift_change(rv[size - i].type, 4, 17 + 10 *i);
+                r |= shift_change(rv[size - i - 1].type, 4, 17 + 10 *i);
                 r |= rv[i].isTerminate ? 0 : (1 << (21 + 10 * i));
             }
             return r;
@@ -134,6 +135,22 @@ namespace rules_translator {
             if (buffer.value().type != rct::block)
                 generateException("Expected a class body to specify all the terminate symbols");
             string &s = buffer->content;
+            // remove comment from
+            {
+                // remove line comment
+                for (size_t b = 0; (b = s.find("//", b)) != string::npos; ++b) {
+                    size_t del = b;
+                    while (del < s.length() && s[del] != '\n' && s[del] != '\r') ++del;
+                    s.erase(s.begin() + b, s.begin() + del + 1); // for that del will not be string::npos which is the largest size_t, unlike the following one it will be ok to exceed the boundery
+                }
+                for (size_t b = 0; (b = s.find("/*", b)) != string::npos; ++b) {
+                    size_t del = s.find("*/");
+                    if (del == string::npos)
+                        s.erase(s.begin() + b, s.end());
+                    else
+                        s.erase(s.begin() + b, s.begin() + del + 2);
+                }
+            }
             auto tempv = utils::split<false>(utils::trimDivider(s), ","); // split and not allow empty
             for (size_t i = 0; i < tempv.size(); ++i) {
                 if (terminate_typeMap.find(tempv[i]) != terminate_typeMap.end())

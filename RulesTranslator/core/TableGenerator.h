@@ -21,6 +21,7 @@ namespace rules_translator {
         TableGenerator_Impl *impl;
     public:
         TableGenerator(FileInteractor &, RulesInfo &);
+        TableGenerator(const TableGenerator &) = delete;
         ~TableGenerator();
         void generate();
         void testGenerate();

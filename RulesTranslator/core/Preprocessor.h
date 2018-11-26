@@ -29,6 +29,7 @@ namespace rules_translator {
         Preprocessor_Impl *impl;
     public:
         Preprocessor(FileInteractor &);
+        Preprocessor(const Preprocessor &) = delete;
         ~Preprocessor();
         RulesInfo *generateInfo();
     };

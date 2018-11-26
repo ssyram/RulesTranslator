@@ -30,13 +30,13 @@ variant<int, bool, double> k;
 #include "extern/TargetFormat.h"
 using std::unordered_set;
 
-namespace utils {
-    bool isNumber(const char c) {
-        return c >= '0' && c <= '9';
-    }
-}
-
-bool (*isnum)(const char c) = &::utils::isNumber;
+//namespace utils {
+//    bool isNumber(const char c) {
+//        return c >= '0' && c <= '9';
+//    }
+//}
+//
+//bool (*isnum)(const char c) = &::utils::isNumber;
 
 int main(int argc, const char * argv[]) {
     
@@ -46,7 +46,7 @@ int main(int argc, const char * argv[]) {
 //        }
 //    });
     
-    rules_translator::test::test_Sample();
+//    rules_translator::test::test_Sample();
     
 //    rules_translator::test::test();
 
@@ -123,7 +123,7 @@ int main(int argc, const char * argv[]) {
 //    for (const auto &s: set)
 //        cout << s << endl;
     
-//    rules_translator::test::test_FileInteractor();
+    rules_translator::test::test_FileInteractor();
     
 //    cout << "abc" << "\a a" << endl;
 //    string s = "abcdefghijklmnopq";

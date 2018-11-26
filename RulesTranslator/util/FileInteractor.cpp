@@ -117,7 +117,7 @@ namespace rules_translator {
 //                getline(origin, buffer);
 //                buffered_pos = 0;
 //            }
-            if (buffer.length() == buffered_pos) {
+            if (buffer.length() <= buffered_pos) {
                 origin >> buffer;
                 buffered_pos = 0;
             }
@@ -136,28 +136,64 @@ namespace rules_translator {
             
             // jump out of comments
             while (buffer[buffered_pos] == '/') {
-                if (++buffered_pos >= buffer.length() || buffer[buffered_pos] != '/')
+                if (++buffered_pos >= buffer.length())
                     err("Not a valid slash here.");
-                getline(origin, buffer);
+                if (buffer[buffered_pos] == '/')
+                    getline(origin, buffer);
+                else if (buffer[buffered_pos] == '*') {
+                    bool mark = false;
+                    while (++buffered_pos < buffer.length())
+                        if (buffer[buffered_pos] == '*' && buffered_pos + 1 < buffer.length() && buffer[buffered_pos + 1] == '/') {
+                            buffered_pos += 2;
+                            if (buffered_pos >= buffer.length()) {
+                                origin >> buffer;
+                                buffered_pos = 0;
+                            }
+                            mark = true;
+                            break;
+                        }
+                    if (mark) continue;
+                    while (1) {
+                        getline(origin, buffer, '*');
+                        if (origin.get() == '/')
+                            break;
+                        origin.unget();
+                    }
+                }
+                else err("Not a valid slash here.");
                 origin >> buffer;
                 buffered_pos = 0;
             }
             
+            size_t left_count = 1;
             size_t originalPos = origin.tellg();
             switch (buffer[buffered_pos]) {
                 case '{':
                     // must not delete the dividers, for some divider in block may be very important in dividing inside words
-                    while (++buffered_pos < buffer.length() && buffer[buffered_pos] != '}')
+                    while (++buffered_pos < buffer.length()) {
 //                        if (!utils::isDivider(buffer[buffered_pos]))
+                        if (buffer[buffered_pos] == '}') {
+                            if (!(--left_count))
+                                break;
+                        }
+                        else if (buffer[buffered_pos] == '{')
+                            ++left_count;
                         ss << buffer[buffered_pos];
-                    if (buffer[buffered_pos] == '}') {
+                    }
+                    if (!left_count) {
                         ++buffered_pos;
                         t = FileInteractor::ReadContentType::block;
                         break;
                     }
-                    getline(origin, buffer, '}');
-                    if (origin.eof())
-                        err("lack corresponding '}' with position: ", originalPos);
+                    while (1) {
+                        getline(origin, buffer, '}');
+                        if (origin.eof())
+                            err("lack corresponding '}' with position: ", originalPos);
+                        for (size_t b = 0; (b = buffer.find("{", b)) != string::npos; ++b)
+                            ++left_count;
+                        if (!(--left_count)) break;
+                        ss << buffer << "}";
+                    }
                     t = FileInteractor::ReadContentType::block;
 //                    for (auto it = buffer.begin(); it != buffer.end(); ++it)
 //                        if (!utils::isDivider(*it))

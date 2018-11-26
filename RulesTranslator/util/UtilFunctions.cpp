@@ -30,9 +30,10 @@ namespace rules_translator::utils {
 //        return isWordBegin(c) || isNumber(c) || c == ':';
 //    }
     string &trimDivider(string &s) {
-        for (string::iterator it = s.begin(); it != s.end(); ++it)
+        for (string::iterator it = s.begin(); it != s.end(); )
             if (isDivider(*it))
-                s.erase(it--);
+                it = s.erase(it);
+            else ++it;
         
         return s;
     }
